@@ -345,15 +345,25 @@ class AirportOpenApiConnector:
             wind_speed = float(self._pick(item, "windSpeed", "wind", "wsd", default=4))
             temperature = float(self._pick(item, "temperature", "temp", "tmp", default=12))
             precipitation = float(self._pick(item, "precipitation", "rn1", default=0))
+            schedule_time = self._normalize_clock_datetime(self._pick(item, "scheduleDateTime", default=datetime.utcnow().isoformat()))
+            estimated_time = self._normalize_clock_datetime(
+                self._pick(item, "estimatedDateTime", default=schedule_time.strftime("%H%M")),
+                schedule_time,
+            )
             rows.append(
                 {
-                    "snapshot_at": self._normalize_datetime(self._pick(item, "datetm", "snapshotAt", default=datetime.utcnow().isoformat())),
+                    "snapshot_at": estimated_time,
+                    "flight_id": self._pick(item, "flightId", "flightid", default="UNKNOWN"),
+                    "terminal": self._normalize_terminal(self._pick(item, "terminalid", "terminal", default="Terminal 1")),
+                    "gate": self._pick(item, "gatenumber", "gate", default=""),
                     "station_name": self._pick(item, "airport", "stationName", "city", default="Incheon International Airport"),
                     "condition": self._pick(item, "weather", "sky", "status", default="Clear"),
                     "precipitation_mm": precipitation,
                     "wind_speed_mps": wind_speed,
                     "visibility_km": float(self._pick(item, "visibility", "vis", default=10)),
                     "temperature_c": temperature,
+                    "humidity_pct": float(self._pick(item, "himidity", "humidity", default=55)),
+                    "remark": self._pick(item, "remark", default=""),
                     "advisory_level": self._pick(
                         item,
                         "advisoryLevel",

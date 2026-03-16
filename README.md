@@ -48,7 +48,7 @@ AIRPORT_PARKING_URL=http://apis.data.go.kr/B551177/StatusOfParking/getTrackingPa
 AIRPORT_FLIGHTS_URL=http://apis.data.go.kr/B551177/StatusOfPassengerFlightsOdp/getPassengerDeparturesOdp
 AIRPORT_AMENITIES_URL=http://apis.data.go.kr/B551177/StatusOfFacility/getFacilityKR
 AIRPORT_WALKING_URL=https://www.data.go.kr/cmm/cmm/fileDownload.do?atchFileId=FILE_000000002316651&fileDetailSn=1&insertDataPrcus=N
-AIRPORT_WEATHER_URL=https://apis.data.go.kr/B551177/StatusOfPassengerWorldWeatherInfo/getPassengerArrivalsWorldWeather
+AIRPORT_WEATHER_URL=https://apis.data.go.kr/B551177/StatusOfPassengerWorldWeatherInfo/getPassengerDeparturesWorldWeather
 ITS_API_KEY=test
 TRAFFIC_API_URL=https://openapi.its.go.kr:9443/trafficInfo
 KMA_WEATHER_URL=http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst
@@ -57,7 +57,7 @@ KMA_WEATHER_URL=http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltr
 - `CONNECTOR_MODE=mock`: 무조건 mock만 사용
 - `CONNECTOR_MODE=auto`: 실데이터가 준비된 항목만 연결, 나머지는 mock fallback
 - `ITS_API_KEY=test`: ITS 제공기관 샘플 키. 실제 운영 전환 시 발급 키로 교체 권장
-- `AIRPORT_WEATHER_URL`: 인천국제공항공사 여객편 상대공항 기상정보 endpoint
+- `AIRPORT_WEATHER_URL`: 인천국제공항공사 출발편 상대공항 기상정보 endpoint
 - `KMA_WEATHER_URL`: 공항 기상 API 실패 시 사용하는 fallback endpoint
 - `PUBLIC_DATA_SERVICE_KEY`: 저장소에는 실제 값이 없고, 로컬 `.env`에서만 관리
 

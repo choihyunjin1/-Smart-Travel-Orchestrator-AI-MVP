@@ -180,6 +180,28 @@ def choose_amenities(amenities: pd.DataFrame, terminal: str, gate_zone: str, spa
     return candidates.sort_values("amenity_score", ascending=False).head(3).to_dict(orient="records")
 
 
+def choose_weather(weather: pd.DataFrame, flight_row: dict[str, Any]) -> dict[str, Any]:
+    if weather.empty:
+        return {
+            "station_name": "Incheon International Airport",
+            "condition": "Clear",
+            "precipitation_mm": 0.0,
+            "wind_speed_mps": 4.0,
+            "visibility_km": 10.0,
+            "temperature_c": 12.0,
+            "advisory_level": "normal",
+        }
+    if "flight_id" in weather.columns:
+        matched = weather[weather["flight_id"] == flight_row["flight_number"]]
+        if not matched.empty:
+            return matched.iloc[0].to_dict()
+    if "terminal" in weather.columns:
+        matched = weather[weather["terminal"].map(normalize_terminal_name) == normalize_terminal_name(flight_row["terminal"])]
+        if not matched.empty:
+            return matched.iloc[0].to_dict()
+    return weather.iloc[0].to_dict()
+
+
 def build_route(
     walking_times: pd.DataFrame,
     terminal: str,
@@ -295,7 +317,7 @@ def generate_plan(
     )
     checkpoint_row = choose_checkpoint(security_waits, request.terminal, flight_row["gate_zone"], request.preference, profile)
     route, route_minutes = build_route(walking_times, request.terminal, request.approach_mode, parking_row, flight_row, checkpoint_row, profile)
-    weather_row = weather.iloc[0].to_dict()
+    weather_row = choose_weather(weather, flight_row)
 
     extra_buffer = int(profile["buffer_min"] + PREFERENCE_SETTINGS[request.preference]["extra_buffer"])
     recommended_airport_arrival = flight_row["estimated_departure"] - timedelta(

@@ -24,7 +24,7 @@
 | 인천국제공항공사_상업 시설 정보 서비스 | 출국장 단계 추천 시설 표시 | `facltNm`, `facltType`, `floor`, `gateNo`, `terminalId` | 공공데이터포털 서비스키 | 실제 연결은 `StatusOfFacility/getFacilityKR` 기준으로 반영했고 실호출 확인 완료 | `connected` |
 | 인천국제공항공사_출국장도보소요시간정보 | 게이트까지 소요시간, 경로 오케스트레이션, 걷기 최소화 로직 | `fromNode`, `toNode`, `walkingTime`, `terminalId`, `accessible` | 파일데이터 또는 공공데이터포털 다운로드 | 공식 파일 다운로드 URL을 `.env`에 반영했고 CSV 로더로 실연결 확인 완료 | `connected` |
 | 인천국제공항공사_승객예고-출·입국장별 | 혼잡도 예측 레이어, 사전 출발 권고 시뮬레이션 강화 | `terminalId`, `departureAreaNo`, `forecastTime`, `numOfPassenger` | 공공데이터포털 서비스키 | 개발 활용신청 승인 완료. 혼잡 예측형 시나리오를 붙일 때 서비스키와 샘플 응답 필요 | `pending user input` |
-| 인천국제공항공사_기상 정보 | 날씨 리스크 가중치 계산 | `airline`, `flightId`, `scheduleDateTime`, `estimatedDateTime`, `airport`, `gatenumber`, `remark`, `airportCode`, `yoil`, `himidity`, `wimage`, `wind`, `temp`, `senstemp`, `terminalid` | 공공데이터포털 서비스키 | 공식 데이터셋은 [15095086](https://www.data.go.kr/data/15095086/openapi.do)이며 endpoint도 반영했다. 사용자는 2026-03-16 개발 활용신청 승인을 받았지만, 로컬에서 `http/https`, `도착/출발 endpoint`, `type/json/xml`, `from_time/to_time`, 브라우저형 헤더까지 바꿔도 모두 `403 Forbidden`이 재현된다. 현재는 제공기관 반영 지연 또는 endpoint 측 권한 문제 후보로 보고, 앱은 기상청 대체 데이터를 fallback으로 사용 | `pending user input` |
+| 인천국제공항공사_기상 정보 | 날씨 리스크 가중치 계산 | `airline`, `flightId`, `scheduleDateTime`, `estimatedDateTime`, `airport`, `gatenumber`, `remark`, `airportCode`, `yoil`, `himidity`, `wimage`, `wind`, `temp`, `senstemp`, `terminalid` | 공공데이터포털 서비스키 | 공식 데이터셋은 [15095086](https://www.data.go.kr/data/15095086/openapi.do)이며, 현재는 `getPassengerDeparturesWorldWeather` 기준으로 실호출 성공을 확인했다. 승인 직후에는 `403`이었지만 시간이 지난 뒤 `200 / NORMAL SERVICE`로 전환됐다. 앱은 출발편 기준으로 선택 항공편의 기상 행을 우선 사용한다 | `connected` |
 | 기상청_단기예보 조회서비스 | 공항기상 대체 데이터, fallback weather | `baseDate`, `baseTime`, `category`, `fcstValue`, `nx`, `ny` | 공공데이터포털 서비스키 | `getUltraSrtFcst` endpoint 반영 완료, 인천공항 격자(`55`,`124`) 기준 실호출 확인 완료 | `connected` |
 | 국토교통부_교통소통정보 | 공항 접근도로 정체 판단, 권장 출발 시각 재계산 | `roadName`, `speed`, `travelTime`, `linkId`, `createdDate` | ITS 제공기관 API 키 | ITS 공식 샘플 키 `test`와 `trafficInfo` endpoint를 반영해 연결. 운영 시 발급 키로 교체 권장 | `connected` |
 | 인천국제공항공사_전국공항 버스정보 | 공항 접근 방식 중 버스 대안 표시 | `routeNm`, `terminal`, `stTime`, `edTime` | 공공데이터포털 서비스키 또는 파일데이터 | 선택사항, 버스 경로 활용 시 샘플 응답 | `pending user input` |
@@ -44,10 +44,6 @@
 ### 사용자 준비가 필요한 항목
 
 - ITS 운영용 API 키
-- 인천국제공항공사_기상 정보 활용신청
-  - 데이터셋: [15095086](https://www.data.go.kr/data/15095086/openapi.do)
-  - 현재 상태: 2026-03-16 승인 완료
-  - 다음 조치: 승인 반영 지연 여부를 확인한 뒤 재시도하고, 계속 `403`이면 제공기관 또는 공공데이터포털에 문의
 - 필요 시 버스정보/승객예고 추가 연결용 샘플 응답
 
 ### 현재 mock only로 유지한 항목
@@ -111,7 +107,7 @@
 - `AIRPORT_FLIGHTS_URL=http://apis.data.go.kr/B551177/StatusOfPassengerFlightsOdp/getPassengerDeparturesOdp`
 - `AIRPORT_AMENITIES_URL=http://apis.data.go.kr/B551177/StatusOfFacility/getFacilityKR`
 - `AIRPORT_WALKING_URL=https://www.data.go.kr/cmm/cmm/fileDownload.do?atchFileId=FILE_000000002316651&fileDetailSn=1&insertDataPrcus=N`
-- `AIRPORT_WEATHER_URL=https://apis.data.go.kr/B551177/StatusOfPassengerWorldWeatherInfo/getPassengerArrivalsWorldWeather`
+- `AIRPORT_WEATHER_URL=https://apis.data.go.kr/B551177/StatusOfPassengerWorldWeatherInfo/getPassengerDeparturesWorldWeather`
 - `KMA_WEATHER_URL=http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst`
 - `TRAFFIC_API_URL=https://openapi.its.go.kr:9443/trafficInfo`
-- `ITS_API_KEY=test`
+- `ITS_API_KEY=사용자 발급 키 반영 완료`
