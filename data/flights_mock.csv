@@ -1,0 +1,7 @@
+flight_id,airline,flight_number,destination,terminal,scheduled_departure,estimated_departure,gate,gate_zone,checkin_area,checkin_open_min,checkin_duration_min,boarding_buffer_min,gate_walk_min,status,delay_min
+ICN001,Korean Air,KE623,Tokyo,Terminal 2,2026-03-14T09:45:00,2026-03-14T09:45:00,253,B,Center,180,18,25,14,ON_TIME,0
+ICN002,Asiana Airlines,OZ501,Los Angeles,Terminal 1,2026-03-14T11:20:00,2026-03-14T11:35:00,118,A,East,180,22,30,16,DELAYED,15
+ICN003,Singapore Airlines,SQ607,Singapore,Terminal 1,2026-03-14T14:05:00,2026-03-14T14:05:00,132,C,West,180,18,25,19,ON_TIME,0
+ICN004,Jeju Air,7C145,Osaka,Terminal 1,2026-03-14T16:10:00,2026-03-14T16:00:00,105,A,Center,150,15,20,13,EARLY,-10
+ICN005,Lufthansa,LH719,Frankfurt,Terminal 1,2026-03-14T12:55:00,2026-03-14T12:55:00,141,C,West,180,20,30,20,ON_TIME,0
+ICN006,Air Premia,YP731,Newark,Terminal 1,2026-03-14T10:30:00,2026-03-14T10:40:00,121,B,East,180,19,28,15,DELAYED,10

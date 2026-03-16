@@ -1,0 +1,8 @@
+amenity_id,terminal,zone,category,name,name_en,walk_from_security_min,walk_to_gate_min,accessible,open_now,recommended_for,description
+A001,Terminal 1,Center,duty_free,신라면세점,Shilla Duty Free,4,10,true,true,tourist,"대표 면세 브랜드가 밀집된 중앙 구역"
+A002,Terminal 1,C,food,한식 푸드코트,Korean Food Court,5,6,true,true,general,"탑승구 C권역과 가까운 식음 거점"
+A003,Terminal 1,A,lounge,조용한 휴게 라운지,Quiet Rest Lounge,3,8,true,true,accessibility,"소음이 적고 좌석 간격이 넓은 휴식 공간"
+A004,Terminal 1,West,cafe,스페셜티 카페,Specialty Cafe,4,9,false,true,business,"출장객이 짧게 머무르기 좋은 카페"
+A005,Terminal 2,Center,duty_free,현대면세점,Hyundai Duty Free,5,11,true,true,tourist,"Terminal 2 대표 면세 구역"
+A006,Terminal 2,B,food,프리미엄 푸드홀,Premium Food Hall,4,7,true,true,general,"간단한 식사와 포장 메뉴 제공"
+A007,Terminal 2,Center,wellness,조용한 케어존,Calm Care Zone,2,9,true,true,accessibility,"교통약자와 고령자를 위한 우선 휴식 공간"

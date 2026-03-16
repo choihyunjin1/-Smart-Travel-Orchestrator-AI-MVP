@@ -1,0 +1,5 @@
+traveler_type,display_name_ko,display_name_en,buffer_min,walking_speed_factor,security_sensitivity,commercial_interest,needs_accessible_route,risk_tolerance,preferred_language
+general,일반 여행객,General traveler,38,1.0,0.6,0.5,false,0.5,ko
+business,출장객,Business traveler,28,1.1,0.7,0.2,false,0.7,ko
+tourist,외국인 관광객,Foreign tourist,44,0.9,0.8,0.9,false,0.4,en
+accessibility,교통약자/고령자,Accessibility traveler,58,0.65,0.9,0.3,true,0.2,ko

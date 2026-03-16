@@ -1,0 +1,2 @@
+snapshot_at,station_name,condition,precipitation_mm,wind_speed_mps,visibility_km,temperature_c,advisory_level
+2026-03-14T07:20:00,Incheon International Airport,Partly Cloudy,0.0,5.2,12.0,8.0,normal

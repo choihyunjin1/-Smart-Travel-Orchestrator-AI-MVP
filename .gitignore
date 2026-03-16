@@ -1,0 +1,15 @@
+.next
+node_modules
+.env
+.env.local
+.venv
+coverage
+dist
+*.log
+__pycache__/
+*.pyc
+.streamlit/
+prisma/dev.db
+data/walking_times_public_cache.csv
+
+.vercel

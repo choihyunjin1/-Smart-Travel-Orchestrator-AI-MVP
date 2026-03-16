@@ -1,0 +1,7 @@
+snapshot_at,terminal,checkpoint_id,zone_name,route_node,predicted_wait_min,crowd_level,passenger_count,max_capacity,walk_from_checkin_min,gate_zone_a_min,gate_zone_b_min,gate_zone_c_min,accessible_route
+2026-03-14T07:20:00,Terminal 1,T1-East,East,Security-East,14,low,680,1200,5,9,12,18,true
+2026-03-14T07:20:00,Terminal 1,T1-Center,Center,Security-Center,22,moderate,920,1200,4,12,10,15,true
+2026-03-14T07:20:00,Terminal 1,T1-West,West,Security-West,18,moderate,810,1200,7,17,13,8,false
+2026-03-14T07:20:00,Terminal 2,T2-East,East,Security-East,16,low,700,1100,5,10,13,17,true
+2026-03-14T07:20:00,Terminal 2,T2-Center,Center,Security-Center,12,low,540,1100,3,12,9,14,true
+2026-03-14T07:20:00,Terminal 2,T2-West,West,Security-West,21,high,980,1100,6,18,14,11,false

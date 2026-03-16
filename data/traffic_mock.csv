@@ -1,0 +1,10 @@
+snapshot_at,route_id,origin_name,mode,predicted_duration_min,baseline_duration_min,congestion_level,reliability_index,incident_flag,route_name,dropoff_node
+2026-03-14T07:20:00,R001,서울역,car,74,58,0.62,0.72,false,Airport Expressway,Parking-East
+2026-03-14T07:20:00,R002,서울역,rail,63,61,0.28,0.88,false,AREX Direct,Transit-Hub
+2026-03-14T07:20:00,R003,서울역,taxi,78,60,0.65,0.70,false,Taxi via Airport Expressway,Dropoff-Hub
+2026-03-14T07:20:00,R004,홍대입구,car,68,52,0.55,0.75,false,Airport Expressway,Parking-Center
+2026-03-14T07:20:00,R005,홍대입구,rail,53,51,0.24,0.91,false,AREX All Stop,Transit-Hub
+2026-03-14T07:20:00,R006,홍대입구,taxi,71,54,0.58,0.74,false,Taxi via Olympicdaero,Dropoff-Hub
+2026-03-14T07:20:00,R007,송도,car,47,39,0.44,0.81,false,Incheon Bridge,Parking-East
+2026-03-14T07:20:00,R008,송도,rail,59,57,0.30,0.86,false,Transit + AREX,Transit-Hub
+2026-03-14T07:20:00,R009,송도,taxi,52,40,0.47,0.79,false,Taxi via Incheon Bridge,Dropoff-Hub

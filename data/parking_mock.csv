@@ -1,0 +1,7 @@
+snapshot_at,terminal,lot_id,lot_name,parking_type,available_spaces,total_spaces,occupancy_rate,walk_to_terminal_min,accessible_spaces,status,entry_node,priority_zone
+2026-03-14T07:20:00,Terminal 1,T1-ST-A,T1 Short-Term A,short_term,88,400,0.78,6,18,available,Parking-East,East
+2026-03-14T07:20:00,Terminal 1,T1-ST-B,T1 Short-Term B,short_term,35,350,0.90,5,14,nearly_full,Parking-Center,Center
+2026-03-14T07:20:00,Terminal 1,T1-LT-A,T1 Long-Term A,long_term,290,900,0.68,11,22,available,Parking-West,West
+2026-03-14T07:20:00,Terminal 2,T2-ST-A,T2 Short-Term A,short_term,142,520,0.73,7,16,available,Parking-East,East
+2026-03-14T07:20:00,Terminal 2,T2-ST-B,T2 Short-Term B,short_term,40,500,0.92,6,19,nearly_full,Parking-Center,Center
+2026-03-14T07:20:00,Terminal 2,T2-LT-A,T2 Long-Term A,long_term,360,980,0.63,12,28,available,Parking-West,West
