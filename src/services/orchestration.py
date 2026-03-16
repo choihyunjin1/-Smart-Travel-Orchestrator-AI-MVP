@@ -51,9 +51,25 @@ def _t(language: str, ko: str, en: str) -> str:
     return en if language == "English" else ko
 
 
+def normalize_terminal_name(value: Any) -> str:
+    raw = str(value or "").strip().upper()
+    mapping = {
+        "P01": "Terminal 1",
+        "P02": "Terminal 1",
+        "P03": "Terminal 2",
+        "T1": "Terminal 1",
+        "T2": "Terminal 2",
+        "TERMINAL 1": "Terminal 1",
+        "TERMINAL 2": "Terminal 2",
+        "탑승동": "Terminal 1",
+    }
+    return mapping.get(raw, str(value).strip() if value else "Terminal 1")
+
+
 def build_graph(walking_times: pd.DataFrame, terminal: str, needs_accessible: bool) -> nx.Graph:
     graph = nx.Graph()
-    filtered = walking_times[walking_times["terminal"] == terminal]
+    normalized_terminal = normalize_terminal_name(terminal)
+    filtered = walking_times[walking_times["terminal"].map(normalize_terminal_name) == normalized_terminal]
     for row in filtered.to_dict(orient="records"):
         if needs_accessible and not bool(row["accessible"]):
             continue
@@ -64,7 +80,7 @@ def build_graph(walking_times: pd.DataFrame, terminal: str, needs_accessible: bo
 def choose_flight(flights: pd.DataFrame, flight_number: str, departure_time: datetime, terminal: str) -> dict[str, Any]:
     flight_rows = flights[flights["flight_number"] == flight_number]
     if flight_rows.empty:
-        flight_rows = flights[flights["terminal"] == terminal]
+        flight_rows = flights[flights["terminal"].map(normalize_terminal_name) == normalize_terminal_name(terminal)]
     if flight_rows.empty:
         flight_rows = flights
     ranked = flight_rows.copy()
@@ -106,7 +122,7 @@ def choose_parking(
 ) -> dict[str, Any] | None:
     if parking.empty:
         return None
-    candidates = parking[parking["terminal"] == terminal].copy()
+    candidates = parking[parking["terminal"].map(normalize_terminal_name) == normalize_terminal_name(terminal)].copy()
     if candidates.empty:
         candidates = parking.copy()
     candidates["zone_match"] = (candidates["priority_zone"].str.lower() == str(checkin_area).lower()).astype(int)
@@ -126,7 +142,7 @@ def choose_parking(
 
 
 def choose_checkpoint(security_waits: pd.DataFrame, terminal: str, gate_zone: str, preference: str, profile: dict[str, Any]) -> dict[str, Any]:
-    candidates = security_waits[security_waits["terminal"] == terminal].copy()
+    candidates = security_waits[security_waits["terminal"].map(normalize_terminal_name) == normalize_terminal_name(terminal)].copy()
     if candidates.empty:
         candidates = security_waits.copy()
     walk_column = f"gate_zone_{str(gate_zone).lower()}_min"
@@ -150,9 +166,12 @@ def choose_checkpoint(security_waits: pd.DataFrame, terminal: str, gate_zone: st
 def choose_amenities(amenities: pd.DataFrame, terminal: str, gate_zone: str, spare_minutes: int, preference: str) -> list[dict[str, Any]]:
     if preference != "면세점/식음 이용 선호" or spare_minutes < 18:
         return []
-    candidates = amenities[(amenities["terminal"] == terminal) & (amenities["zone"].isin([gate_zone, "Center"]))].copy()
+    normalized_terminal = normalize_terminal_name(terminal)
+    candidates = amenities[
+        (amenities["terminal"].map(normalize_terminal_name) == normalized_terminal) & (amenities["zone"].isin([gate_zone, "Center"]))
+    ].copy()
     if candidates.empty:
-        candidates = amenities[amenities["terminal"] == terminal].copy()
+        candidates = amenities[amenities["terminal"].map(normalize_terminal_name) == normalized_terminal].copy()
     candidates["amenity_score"] = (
         candidates["open_now"].astype(int) * 20
         + candidates["accessible"].astype(int) * 10
@@ -181,16 +200,39 @@ def build_route(
     checkin_node = f"CheckIn-{flight_row['checkin_area']}"
     gate_node = f"Gate-{flight_row['gate_zone']}"
     nodes = [start_node, checkin_node, security_node, gate_node]
+    if any(node not in graph for node in nodes):
+        return _fallback_route(nodes, parking_row, checkpoint_row, flight_row, profile)
     total_path: list[str] = []
     total_minutes = 0
     for source, target in zip(nodes, nodes[1:]):
-        path = nx.shortest_path(graph, source, target, weight="weight")
+        try:
+            path = nx.shortest_path(graph, source, target, weight="weight")
+            segment_minutes = int(nx.shortest_path_length(graph, source, target, weight="weight"))
+        except (nx.NetworkXNoPath, nx.NodeNotFound):
+            return _fallback_route(nodes, parking_row, checkpoint_row, flight_row, profile)
         if total_path:
             total_path.extend(path[1:])
         else:
             total_path.extend(path)
-        total_minutes += int(nx.shortest_path_length(graph, source, target, weight="weight"))
+        total_minutes += segment_minutes
     return total_path, total_minutes
+
+
+def _fallback_route(
+    nodes: list[str],
+    parking_row: dict[str, Any] | None,
+    checkpoint_row: dict[str, Any],
+    flight_row: dict[str, Any],
+    profile: dict[str, Any],
+) -> tuple[list[str], int]:
+    route = list(nodes)
+    extra_minutes = 0
+    if profile["needs_accessible_route"] and "Elevator-Hub" not in route:
+        route.insert(1, "Elevator-Hub")
+        extra_minutes += 4
+    parking_walk = int(parking_row["walk_to_terminal_min"]) if parking_row else 6
+    total_minutes = parking_walk + int(checkpoint_row["walk_from_checkin_min"]) + int(flight_row["gate_walk_min"]) + extra_minutes
+    return route, total_minutes
 
 
 def score_risk(
@@ -238,7 +280,7 @@ def generate_plan(
 ) -> TravelPlan:
     profile = choose_profile(profiles, request.traveler_type)
     flight_row = choose_flight(flights, request.flight_number, request.departure_time, request.terminal)
-    flight_row["terminal"] = request.terminal
+    flight_row["terminal"] = normalize_terminal_name(request.terminal)
     traffic_row = choose_traffic_route(traffic, request.current_location, request.approach_mode, request.current_travel_time_min)
     parking_row = (
         choose_parking(

@@ -14,6 +14,7 @@ from src.services.orchestration import (
     build_stage_cards,
     compare_plan_frame,
     generate_plan,
+    normalize_terminal_name,
     plan_to_frame,
     route_to_markdown,
     simulate_event,
@@ -196,18 +197,25 @@ def main() -> None:
     scenario_name = st.sidebar.selectbox("시연 시나리오", list(SCENARIO_PRESETS.keys()))
     preset = SCENARIO_PRESETS[scenario_name]
 
-    flights = data["flights"].sort_values("scheduled_departure")
-    flight_numbers = flights["flight_number"].tolist()
-    default_flight = preset.get("flight_number", flight_numbers[0])
-    default_index = flight_numbers.index(default_flight) if default_flight in flight_numbers else 0
-    selected_flight_number = st.sidebar.selectbox("항공편", flight_numbers, index=default_index)
-    selected_flight_row = flights[flights["flight_number"] == selected_flight_number].iloc[0]
+    flights = data["flights"].sort_values("scheduled_departure").reset_index(drop=True)
+    flights["terminal_normalized"] = flights["terminal"].map(normalize_terminal_name)
+    flight_options = flights.to_dict(orient="records")
+    default_flight = preset.get("flight_number", flight_options[0]["flight_number"])
+    default_index = next((idx for idx, row in enumerate(flight_options) if row["flight_number"] == default_flight), 0)
+    selected_flight_row = st.sidebar.selectbox(
+        "항공편",
+        flight_options,
+        index=default_index,
+        format_func=lambda row: f"{row['flight_number']} | {row['destination']} | {pd.to_datetime(row['scheduled_departure']).strftime('%m-%d %H:%M')} | {row['terminal_normalized']}",
+    )
+    selected_flight_number = selected_flight_row["flight_number"]
 
     ui_language = st.sidebar.selectbox("UI Language", ["한국어", "English"], index=0 if preset.get("ui_language", "한국어") == "한국어" else 1)
     departure_date = st.sidebar.date_input("출발 날짜", value=selected_flight_row["scheduled_departure"].date())
     departure_time = st.sidebar.time_input("출발 시각", value=selected_flight_row["scheduled_departure"].time())
-    terminals = sorted(flights["terminal"].unique().tolist())
-    terminal = st.sidebar.selectbox("터미널", terminals, index=terminals.index(selected_flight_row["terminal"]))
+    terminals = sorted(flights["terminal_normalized"].unique().tolist())
+    default_terminal = selected_flight_row["terminal_normalized"]
+    terminal = st.sidebar.selectbox("터미널", terminals, index=terminals.index(default_terminal))
 
     traffic_options = data["traffic"]
     origin_choices = sorted(traffic_options["origin_name"].unique().tolist())

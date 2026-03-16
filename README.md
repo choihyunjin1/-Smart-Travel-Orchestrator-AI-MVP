@@ -69,6 +69,6 @@ KMA_WEATHER_URL=http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltr
 
 ## 문서
 
-- [public_data_plan.md](/Users/cedis/OneDrive/문서/New%20project/docs/public_data_plan.md)
-- [architecture.md](/Users/cedis/OneDrive/문서/New%20project/docs/architecture.md)
-- [scenarios.md](/Users/cedis/OneDrive/문서/New%20project/docs/scenarios.md)
+- [public_data_plan.md](docs/public_data_plan.md)
+- [architecture.md](docs/architecture.md)
+- [scenarios.md](docs/scenarios.md)
