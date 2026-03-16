@@ -12,7 +12,7 @@
 
 - 저장소 공개본에는 실제 `PUBLIC_DATA_SERVICE_KEY`를 포함하지 않는다.
 - GitHub에는 `.env.example`만 포함하며 실제 `.env`는 로컬 전용이다.
-- 공개 저장소의 `.env.example`에는 현재 실제 사용 중인 변수만 남긴다. 기상은 공항 자체 API 대신 `KMA_WEATHER_URL`을 통해 기상청 초단기예보를 사용한다.
+- 공개 저장소의 `.env.example`에는 실제 연결 후보 endpoint를 포함한다. 다만 실제 서비스키는 공개하지 않는다.
 
 ## 데이터셋 계획
 
@@ -24,7 +24,7 @@
 | 인천국제공항공사_상업 시설 정보 서비스 | 출국장 단계 추천 시설 표시 | `facltNm`, `facltType`, `floor`, `gateNo`, `terminalId` | 공공데이터포털 서비스키 | 실제 연결은 `StatusOfFacility/getFacilityKR` 기준으로 반영했고 실호출 확인 완료 | `connected` |
 | 인천국제공항공사_출국장도보소요시간정보 | 게이트까지 소요시간, 경로 오케스트레이션, 걷기 최소화 로직 | `fromNode`, `toNode`, `walkingTime`, `terminalId`, `accessible` | 파일데이터 또는 공공데이터포털 다운로드 | 공식 파일 다운로드 URL을 `.env`에 반영했고 CSV 로더로 실연결 확인 완료 | `connected` |
 | 인천국제공항공사_승객예고-출·입국장별 | 혼잡도 예측 레이어, 사전 출발 권고 시뮬레이션 강화 | `terminalId`, `departureAreaNo`, `forecastTime`, `numOfPassenger` | 공공데이터포털 서비스키 | 개발 활용신청 승인 완료. 혼잡 예측형 시나리오를 붙일 때 서비스키와 샘플 응답 필요 | `pending user input` |
-| 인천국제공항공사_여객편 실시간 운항정보_공항기상정보 | 날씨 리스크 가중치 계산 | `weather`, `windSpeed`, `visibility`, `temperature`, `datetm` | 공공데이터포털 서비스키 | 현재는 공항 자체 기상 API 미연결. 공개 저장소 설정 예시에는 이 변수를 노출하지 않았고, MVP에서는 기상청 대체 데이터를 사용 | `pending user input` |
+| 인천국제공항공사_여객편 실시간 운항정보_공항기상정보 | 날씨 리스크 가중치 계산 | `weather`, `windSpeed`, `visibility`, `temperature`, `datetm` | 공공데이터포털 서비스키 | 공개 저장소 설정 예시에 endpoint를 반영했다. 현재는 호출 안정성 검증이 더 필요하며, 실패 시 기상청 대체 데이터를 fallback으로 사용 | `pending user input` |
 | 기상청_단기예보 조회서비스 | 공항기상 대체 데이터, fallback weather | `baseDate`, `baseTime`, `category`, `fcstValue`, `nx`, `ny` | 공공데이터포털 서비스키 | `getUltraSrtFcst` endpoint 반영 완료, 인천공항 격자(`55`,`124`) 기준 실호출 확인 완료 | `connected` |
 | 국토교통부_교통소통정보 | 공항 접근도로 정체 판단, 권장 출발 시각 재계산 | `roadName`, `speed`, `travelTime`, `linkId`, `createdDate` | ITS 제공기관 API 키 | ITS 공식 샘플 키 `test`와 `trafficInfo` endpoint를 반영해 연결. 운영 시 발급 키로 교체 권장 | `connected` |
 | 인천국제공항공사_전국공항 버스정보 | 공항 접근 방식 중 버스 대안 표시 | `routeNm`, `terminal`, `stTime`, `edTime` | 공공데이터포털 서비스키 또는 파일데이터 | 선택사항, 버스 경로 활용 시 샘플 응답 | `pending user input` |
@@ -107,6 +107,7 @@
 - `AIRPORT_FLIGHTS_URL=http://apis.data.go.kr/B551177/StatusOfPassengerFlightsOdp/getPassengerDeparturesOdp`
 - `AIRPORT_AMENITIES_URL=http://apis.data.go.kr/B551177/StatusOfFacility/getFacilityKR`
 - `AIRPORT_WALKING_URL=https://www.data.go.kr/cmm/cmm/fileDownload.do?atchFileId=FILE_000000002316651&fileDetailSn=1&insertDataPrcus=N`
+- `AIRPORT_WEATHER_URL=https://apis.data.go.kr/B551177/StatusOfPassengerWorldWeatherInfo/getPassengerArrivalsWorldWeather`
 - `KMA_WEATHER_URL=http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst`
 - `TRAFFIC_API_URL=https://openapi.its.go.kr:9443/trafficInfo`
 - `ITS_API_KEY=test`

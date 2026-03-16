@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import re
 import pandas as pd
 
 from src.config import AppConfig
@@ -21,12 +22,18 @@ class HybridTravelDataGateway(TravelDataGateway):
         self.kma = WeatherOpenApiConnector(config)
         self._statuses = {status.dataset_name: status for status in self.mock.get_statuses()}
 
+    def _sanitize_detail(self, detail: str) -> str:
+        sanitized = re.sub(r"(serviceKey=)[^&\\s]+", r"\1REDACTED", detail)
+        if self.config.service_key:
+            sanitized = sanitized.replace(self.config.service_key, "REDACTED")
+        return sanitized
+
     def _with_status(self, dataset_name: str, status: str, detail: str) -> None:
         base = self._statuses.get(
             dataset_name,
             ConnectorStatus(source_name="Public Data", dataset_name=dataset_name, status=status, detail=detail),
         )
-        self._statuses[dataset_name] = replace(base, status=status, detail=detail)
+        self._statuses[dataset_name] = replace(base, status=status, detail=self._sanitize_detail(detail))
 
     def _load_dataset(
         self,
@@ -74,13 +81,56 @@ class HybridTravelDataGateway(TravelDataGateway):
         return self.mock.get_profiles()
 
     def get_weather(self) -> pd.DataFrame:
-        return self._load_dataset(
-            "공항기상정보",
-            self.airport.get_weather if self.config.airport_weather_url else self.kma.get_weather,
-            self.mock.get_weather,
-            [self.config.airport_weather_url or self.config.kma_weather_url],
-            missing_detail="공항기상정보 또는 기상청 단기예보 URL/서비스키가 없어 mock 날씨를 사용합니다.",
+        dataset_name = "공항기상정보"
+
+        if self.config.connector_mode == "mock":
+            self._with_status(dataset_name, "mock only", "CONNECTOR_MODE=mock 설정으로 mock 데이터만 사용합니다.")
+            return self.mock.get_weather()
+
+        if not self.config.service_key or not (self.config.airport_weather_url or self.config.kma_weather_url):
+            self._with_status(
+                dataset_name,
+                "pending user input",
+                "공항기상정보 또는 기상청 단기예보 URL/서비스키가 없어 mock 날씨를 사용합니다.",
+            )
+            return self.mock.get_weather()
+
+        if self.config.airport_weather_url:
+            try:
+                data = self.airport.get_weather()
+                if not data.empty:
+                    self._with_status(dataset_name, "connected", "인천국제공항공사 기상 정보 API 호출에 성공했습니다.")
+                    return data
+            except Exception as exc:
+                airport_error = str(exc)
+            else:
+                airport_error = "공항 기상 API 응답이 비어 있습니다."
+        else:
+            airport_error = "공항 기상 API URL이 설정되지 않았습니다."
+
+        if self.config.kma_weather_url:
+            try:
+                data = self.kma.get_weather()
+                if not data.empty:
+                    self._with_status(
+                        dataset_name,
+                        "connected",
+                        f"공항 기상 API를 사용하지 못해 기상청 초단기예보 fallback으로 연결했습니다: {airport_error}",
+                    )
+                    return data
+            except Exception as exc:
+                kma_error = str(exc)
+            else:
+                kma_error = "기상청 초단기예보 응답이 비어 있습니다."
+        else:
+            kma_error = "기상청 초단기예보 URL이 설정되지 않았습니다."
+
+        self._with_status(
+            dataset_name,
+            "pending user input",
+            f"실호출 실패로 mock 날씨 사용 중: 공항 API={airport_error}; KMA={kma_error}",
         )
+        return self.mock.get_weather()
 
     def get_walking_times(self) -> pd.DataFrame:
         return self._load_dataset(
