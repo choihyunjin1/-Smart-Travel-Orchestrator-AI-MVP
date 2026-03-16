@@ -16,6 +16,12 @@
 - `data/*.csv`: 공공데이터 교체를 전제로 한 mock 데이터
 - `docs/public_data_plan.md`: 데이터별 준비물과 연결 상태
 
+## 보안과 공개 범위
+
+- 저장소에는 실제 `PUBLIC_DATA_SERVICE_KEY`를 올리지 않는다.
+- GitHub에는 예시 설정 파일인 `.env.example`만 포함되고, 실제 `.env`는 제외된다.
+- `AIRPORT_WEATHER_URL`이 비어 있는 것은 누락이 아니라 의도다. 현재 공항 자체 기상 API 대신 `KMA_WEATHER_URL`의 기상청 초단기예보를 공항기상 대체 데이터로 사용한다.
+
 ## 실행 방법
 
 1. Python 3.11 권장
@@ -51,6 +57,8 @@ KMA_WEATHER_URL=http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltr
 - `CONNECTOR_MODE=mock`: 무조건 mock만 사용
 - `CONNECTOR_MODE=auto`: 실데이터가 준비된 항목만 연결, 나머지는 mock fallback
 - `ITS_API_KEY=test`: ITS 제공기관 샘플 키. 실제 운영 전환 시 발급 키로 교체 권장
+- `AIRPORT_WEATHER_URL=`: 현재 비워 둔 것이 정상. 공항 자체 기상 API 대신 `KMA_WEATHER_URL`을 사용 중
+- `PUBLIC_DATA_SERVICE_KEY`: 저장소에는 실제 값이 없고, 로컬 `.env`에서만 관리
 
 ## 시연 포인트
 
