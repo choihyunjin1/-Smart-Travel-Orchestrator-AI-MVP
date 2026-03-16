@@ -26,7 +26,7 @@
 | 인천국제공항공사_승객예고-출·입국장별 | 혼잡도 예측 레이어, 사전 출발 권고 시뮬레이션 강화 | `terminalId`, `departureAreaNo`, `forecastTime`, `numOfPassenger` | 공공데이터포털 서비스키 | 개발 활용신청 승인 완료. 혼잡 예측형 시나리오를 붙일 때 서비스키와 샘플 응답 필요 | `pending user input` |
 | 인천국제공항공사_기상 정보 | 날씨 리스크 가중치 계산 | `airline`, `flightId`, `scheduleDateTime`, `estimatedDateTime`, `airport`, `gatenumber`, `remark`, `airportCode`, `yoil`, `himidity`, `wimage`, `wind`, `temp`, `senstemp`, `terminalid` | 공공데이터포털 서비스키 | 공식 데이터셋은 [15095086](https://www.data.go.kr/data/15095086/openapi.do)이며, 현재는 `getPassengerDeparturesWorldWeather` 기준으로 실호출 성공을 확인했다. 승인 직후에는 `403`이었지만 시간이 지난 뒤 `200 / NORMAL SERVICE`로 전환됐다. 앱은 출발편 기준으로 선택 항공편의 기상 행을 우선 사용한다 | `connected` |
 | 기상청_단기예보 조회서비스 | 공항기상 대체 데이터, fallback weather | `baseDate`, `baseTime`, `category`, `fcstValue`, `nx`, `ny` | 공공데이터포털 서비스키 | `getUltraSrtFcst` endpoint 반영 완료, 인천공항 격자(`55`,`124`) 기준 실호출 확인 완료 | `connected` |
-| 국토교통부_교통소통정보 | 공항 접근도로 정체 판단, 권장 출발 시각 재계산 | `roadName`, `speed`, `travelTime`, `linkId`, `createdDate` | ITS 제공기관 API 키 | ITS 공식 샘플 키 `test`와 `trafficInfo` endpoint를 반영해 연결. 운영 시 발급 키로 교체 권장 | `connected` |
+| 국토교통부_교통소통정보 | 공항 접근도로 정체 판단, 권장 출발 시각 재계산 | `roadName`, `speed`, `travelTime`, `linkId`, `createdDate` | ITS 제공기관 API 키 | 사용자가 발급받은 ITS 키와 `trafficInfo` endpoint를 반영해 실호출 확인 완료 | `connected` |
 | 인천국제공항공사_전국공항 버스정보 | 공항 접근 방식 중 버스 대안 표시 | `routeNm`, `terminal`, `stTime`, `edTime` | 공공데이터포털 서비스키 또는 파일데이터 | 선택사항, 버스 경로 활용 시 샘플 응답 | `pending user input` |
 
 ## 현재 구현 상태
@@ -43,7 +43,6 @@
 
 ### 사용자 준비가 필요한 항목
 
-- ITS 운영용 API 키
 - 필요 시 버스정보/승객예고 추가 연결용 샘플 응답
 
 ### 현재 mock only로 유지한 항목
@@ -58,11 +57,6 @@
   - 어디서: 활용가이드
   - 형식: 일/분당 제한, JSON/XML 지원 여부
   - 이유: 캐시 전략과 fallback 로직 설계에 필요
-
-- [필수] ITS 운영용 API 키
-  - 어디서: [ITS 국가교통정보센터 오픈데이터](https://www.its.go.kr/opendata/opendataList?service=traffic)
-  - 형식: `apiKey`
-  - 이유: 현재는 공식 샘플 키 `test`로 연결되어 있어 제출/운영 단계에서는 발급 키로 교체하는 편이 안전함
 
 - [선택] API 샘플 응답
   - 어디서: 포털 샘플 호출 또는 직접 받은 응답
